@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Heading: Playfair Display | Font Body: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2 family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- ============================ FONT AWESOME ============================ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -216,7 +216,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh; /* PERBAIKAN: Diubah dari 100% menjadi 100vh agar pas satu layar */
+            height: 100vh; /* Pas satu layar */
             background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80');
             background-size: cover;
             background-position: center;
@@ -768,7 +768,7 @@
                     
                     <div class="guest-box mt-4">
                         <p>Kepada Yth. Bapak/Ibu/Saudara/i:</p>
-                        <p class="guest-name">Kamil</p>
+                        <p class="guest-name">Tamu Undangan</p>
                     </div>
 
                     <button class="btn-primary" id="btn-open-invitation">
@@ -935,7 +935,22 @@
 
                 <!-- Guestbook (Tempat Pesan Dinamis Akan Ditampilkan) -->
                 <div class="guestbook-box reveal" id="guestbook-list">
-                    <div style="text-align: center; color: #999; padding: 20px;">Memuat ucapan...</div>
+                    <div class="guest-comment">
+                        <div class="gc-name">Keluarga Bpk. Haryo <span class="gc-badge">Hadir</span></div>
+                        <div class="gc-text">Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.</div>
+                    </div>
+                    <div class="guest-comment">
+                        <div class="gc-name">Siska (Sahabat Kampus) <span class="gc-badge">Hadir</span></div>
+                        <div class="gc-text">Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.</div>
+                    </div>
+                    <div class="guest-comment">
+                        <div class="gc-name">Rizal (Rekan Kantor) <span class="gc-badge" style="background:#eee; color: #666;">Tidak Hadir</span></div>
+                        <div class="gc-text">Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!</div>
+                    </div>
+                    <div class="guest-comment">
+                        <div class="gc-name">Tante Dina <span class="gc-badge">Hadir</span></div>
+                        <div class="gc-text">Alhamdulillah, selamat ya nak. Semoga kelak diberikan keturunan yang sholeh dan sholehah.</div>
+                    </div>
                 </div>
             </section>
 
@@ -971,44 +986,19 @@
     <!-- ============================ TOAST NOTIFICATION (ALERT) ============================ -->
     <div id="toast">Nomor rekening berhasil disalin!</div>
 
-    <!-- ============================ JAVASCRIPT ============================ -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Konfigurasi Cloud Database (Firebase)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'undangan-app';
-        
-        let currentUser = null;
-
-        // Login anonim otomatis untuk keamanan akses database
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Gagal autentikasi", err);
-            }
-        };
-        initAuth();
-
+    <!-- ============================ JAVASCRIPT UTAMA (UI & INTERAKSI) ============================ -->
+    <script>
         /* ============================ 0. GENERATE NAMA TAMU DARI URL ============================ */
         const urlParams = new URLSearchParams(window.location.search);
         const guestName = urlParams.get('to');
         const guestNameElement = document.querySelector('.guest-name');
         
-        if (guestName) {
-            guestNameElement.innerHTML = guestName;
-        } else {
-            guestNameElement.innerHTML = "Tamu Undangan";
+        if (guestNameElement) {
+            if (guestName) {
+                guestNameElement.innerHTML = guestName;
+            } else {
+                guestNameElement.innerHTML = "Tamu Undangan";
+            }
         }
 
         /* ============================ 1. BUKA UNDANGAN & PLAY AUDIO ============================ */
@@ -1018,36 +1008,43 @@
         const musicControl = document.getElementById('music-control');
         let isPlaying = false;
 
-        btnOpen.addEventListener('click', () => {
-            coverPage.classList.add('slide-up');
-            document.body.classList.add('opened');
-            musicControl.style.display = 'flex';
-            
-            bgMusic.play();
-            isPlaying = true;
-            musicControl.classList.add('playing');
+        if (btnOpen && coverPage && bgMusic && musicControl) {
+            btnOpen.addEventListener('click', () => {
+                coverPage.classList.add('slide-up');
+                document.body.classList.add('opened');
+                musicControl.style.display = 'flex';
+                
+                bgMusic.play().then(() => {
+                    isPlaying = true;
+                    musicControl.classList.add('playing');
+                }).catch(err => {
+                    console.log("Autoplay dicegah oleh peramban. Menunggu interaksi pengguna.");
+                });
 
-            setTimeout(() => {
-                coverPage.style.display = 'none';
-            }, 1000);
-        });
+                setTimeout(() => {
+                    coverPage.style.display = 'none';
+                }, 1000);
+            });
+        }
 
         /* ============================ 2. KONTROL MUSIK PLAY/PAUSE ============================ */
-        musicControl.addEventListener('click', () => {
-            if (isPlaying) {
-                bgMusic.pause();
-                musicControl.classList.remove('playing');
-                musicControl.innerHTML = '<i class="fas fa-volume-mute"></i>';
-            } else {
-                bgMusic.play();
-                musicControl.classList.add('playing');
-                musicControl.innerHTML = '<i class="fas fa-compact-disc"></i>';
-            }
-            isPlaying = !isPlaying;
-        });
+        if (musicControl && bgMusic) {
+            musicControl.addEventListener('click', () => {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    musicControl.classList.remove('playing');
+                    musicControl.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    bgMusic.play().then(() => {
+                        musicControl.classList.add('playing');
+                        musicControl.innerHTML = '<i class="fas fa-compact-disc"></i>';
+                    }).catch(err => console.error(err));
+                }
+                isPlaying = !isPlaying;
+            });
+        }
 
         /* ============================ 3. COUNTDOWN TIMER ============================ */
-        // Tanggal acara disesuaikan ke tahun 2026 agar hitung mundur dapat berjalan
         const weddingDate = new Date("Dec 07, 2026 08:00:00").getTime();
 
         const x = setInterval(function() {
@@ -1059,17 +1056,26 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            document.getElementById("hari-hero").innerHTML = days < 10 ? "0" + days : days;
-            document.getElementById("jam-hero").innerHTML = hours < 10 ? "0" + hours : hours;
-            document.getElementById("menit-hero").innerHTML = minutes < 10 ? "0" + minutes : minutes;
-            document.getElementById("detik-hero").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+            const elDays = document.getElementById("hari-hero");
+            const elHours = document.getElementById("jam-hero");
+            const elMinutes = document.getElementById("menit-hero");
+            const elSeconds = document.getElementById("detik-hero");
+
+            if (elDays && elHours && elMinutes && elSeconds) {
+                elDays.innerHTML = days < 10 ? "0" + days : days;
+                elHours.innerHTML = hours < 10 ? "0" + hours : hours;
+                elMinutes.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+                elSeconds.innerHTML = seconds < 10 ? "0" + seconds : seconds;
+            }
 
             if (distance < 0) {
                 clearInterval(x);
-                document.getElementById("hari-hero").innerHTML = "00";
-                document.getElementById("jam-hero").innerHTML = "00";
-                document.getElementById("menit-hero").innerHTML = "00";
-                document.getElementById("detik-hero").innerHTML = "00";
+                if (elDays && elHours && elMinutes && elSeconds) {
+                    elDays.innerHTML = "00";
+                    elHours.innerHTML = "00";
+                    elMinutes.innerHTML = "00";
+                    elSeconds.innerHTML = "00";
+                }
             }
         }, 1000);
 
@@ -1091,19 +1097,25 @@
 
         /* ============================ 5. SALIN TEKS (COPY TO CLIPBOARD) ============================ */
         window.copyText = function(elementId) {
-            var textToCopy = document.getElementById(elementId).innerText;
+            var textElement = document.getElementById(elementId);
+            if (!textElement) return;
+            var textToCopy = textElement.innerText;
             
             navigator.clipboard.writeText(textToCopy).then(() => {
                 var toast = document.getElementById("toast");
-                toast.innerText = "Nomor rekening berhasil disalin!";
-                toast.className = "show";
-                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+                if (toast) {
+                    toast.innerText = "Nomor rekening berhasil disalin!";
+                    toast.className = "show";
+                    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+                }
             }).catch(err => {
                 document.execCommand('copy');
                 var toast = document.getElementById("toast");
-                toast.innerText = "Nomor berhasil disalin!";
-                toast.className = "show";
-                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+                if (toast) {
+                    toast.innerText = "Nomor berhasil disalin!";
+                    toast.className = "show";
+                    setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+                }
             });
         }
 
@@ -1130,99 +1142,8 @@
             });
         });
 
-        /* ============================ 7. DINAMIS GUESTBOOK (RSVP) DENGAN DATABASE ============================ */
-        const rsvpForm = document.getElementById('rsvp-form');
-        const guestbookList = document.getElementById('guestbook-list');
-
-        function showToast(message) {
-            var toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.className = "show";
-            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
-        }
-
-        // Listener untuk memuat data secara realtime
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
-                
-                onSnapshot(messagesRef, (snapshot) => {
-                    const messages = [];
-                    snapshot.forEach((doc) => {
-                        messages.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    // Urutkan ucapan dari yang terbaru di memori
-                    messages.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                    
-                    guestbookList.innerHTML = ''; 
-                    
-                    if (messages.length === 0) {
-                        guestbookList.innerHTML = '<div style="text-align: center; color: #999; padding:20px;">Belum ada ucapan. Jadilah yang pertama!</div>';
-                        return;
-                    }
-
-                    messages.forEach(msg => {
-                        const commentDiv = document.createElement('div');
-                        commentDiv.className = 'guest-comment';
-
-                        let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
-                        let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
-
-                        commentDiv.innerHTML = `
-                            <div class="gc-name">
-                                ${escapeHTML(msg.name)} 
-                                <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
-                            </div>
-                            <div class="gc-text">${escapeHTML(msg.message)}</div>
-                        `;
-                        guestbookList.appendChild(commentDiv);
-                    });
-                }, (error) => {
-                    console.error("Gagal memuat pesan:", error);
-                });
-            }
-        });
-
-        rsvpForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!currentUser) {
-                showToast("Sistem belum siap. Mohon tunggu sebentar.");
-                return;
-            }
-
-            const name = document.getElementById('rsvp-name').value;
-            const status = document.getElementById('rsvp-status').value;
-            const message = document.getElementById('rsvp-message').value;
-            const submitBtn = rsvpForm.querySelector('button[type="submit"]');
-
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = "Mengirim...";
-            submitBtn.disabled = true;
-
-            try {
-                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
-                await addDoc(messagesRef, {
-                    name: name,
-                    status: status,
-                    message: message,
-                    timestamp: Date.now()
-                });
-
-                rsvpForm.reset();
-                showToast("Terima kasih! Ucapan Anda telah dikirim.");
-            } catch (error) {
-                console.error("Error mengirim pesan: ", error);
-                showToast("Gagal mengirim ucapan. Periksa koneksi Anda.");
-            } finally {
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
-            }
-        });
-
-        function escapeHTML(str) {
+        // Fungsi Global Sanitasi Input
+        window.escapeHTML = function(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({
                     '&': '&amp;',
@@ -1232,6 +1153,197 @@
                     '"': '&quot;'
                 }[tag] || tag)
             );
+        }
+    </script>
+
+    <!-- ============================ JAVASCRIPT DATABASE (FIREBASE CLOUD) ============================ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'undangan-app';
+        
+        const rsvpForm = document.getElementById('rsvp-form');
+        const guestbookList = document.getElementById('guestbook-list');
+
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            if (toast) {
+                toast.innerText = message;
+                toast.className = "show";
+                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+            }
+        }
+
+        // Data Ucapan Bawaan (Default/Offline Demo)
+        let localGuestbook = [
+            { name: "Keluarga Bpk. Haryo", status: "hadir", message: "Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.", timestamp: Date.now() - 30000 },
+            { name: "Siska (Sahabat Kampus)", status: "hadir", message: "Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.", timestamp: Date.now() - 20000 },
+            { name: "Rizal (Rekan Kantor)", status: "tidak", message: "Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!", timestamp: Date.now() - 10000 }
+        ];
+
+        function renderLocalGuestbook() {
+            if (!guestbookList) return;
+            guestbookList.innerHTML = ''; 
+            localGuestbook.sort((a, b) => b.timestamp - a.timestamp).forEach(msg => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'guest-comment';
+                let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
+                let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
+
+                commentDiv.innerHTML = `
+                    <div class="gc-name">
+                        ${window.escapeHTML(msg.name)} 
+                        <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                    </div>
+                    <div class="gc-text">${window.escapeHTML(msg.message)}</div>
+                `;
+                guestbookList.appendChild(commentDiv);
+            });
+        }
+
+        // Jalankan Firebase jika konfigurasi tersedia
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                let currentUser = null;
+
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (err) {
+                        console.error("Gagal autentikasi", err);
+                    }
+                };
+                initAuth();
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
+                        
+                        onSnapshot(messagesRef, (snapshot) => {
+                            const messages = [];
+                            snapshot.forEach((doc) => {
+                                messages.push({ id: doc.id, ...doc.data() });
+                            });
+                            
+                            messages.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                            if (guestbookList) {
+                                guestbookList.innerHTML = ''; 
+                                
+                                if (messages.length === 0) {
+                                    guestbookList.innerHTML = '<div style="text-align: center; color: #999; padding:20px;">Belum ada ucapan. Jadilah yang pertama!</div>';
+                                    return;
+                                }
+
+                                messages.forEach(msg => {
+                                    const commentDiv = document.createElement('div');
+                                    commentDiv.className = 'guest-comment';
+                                    let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
+                                    let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
+
+                                    commentDiv.innerHTML = `
+                                        <div class="gc-name">
+                                            ${window.escapeHTML(msg.name)} 
+                                            <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                                        </div>
+                                        <div class="gc-text">${window.escapeHTML(msg.message)}</div>
+                                    `;
+                                    guestbookList.appendChild(commentDiv);
+                                });
+                            }
+                        }, (error) => {
+                            console.error("Gagal sinkronisasi data Firebase, beralih ke local:", error);
+                            renderLocalGuestbook();
+                        });
+                    }
+                });
+
+                if (rsvpForm) {
+                    rsvpForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        if (!currentUser) {
+                            showToast("Koneksi database terputus. Silakan coba sesaat lagi.");
+                            return;
+                        }
+
+                        const name = document.getElementById('rsvp-name').value;
+                        const status = document.getElementById('rsvp-status').value;
+                        const message = document.getElementById('rsvp-message').value;
+                        const submitBtn = rsvpForm.querySelector('button[type="submit"]');
+
+                        const originalText = submitBtn.innerText;
+                        submitBtn.innerText = "Mengirim...";
+                        submitBtn.disabled = true;
+
+                        try {
+                            const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
+                            await addDoc(messagesRef, {
+                                name: name,
+                                status: status,
+                                message: message,
+                                timestamp: Date.now()
+                            });
+
+                            rsvpForm.reset();
+                            showToast("Terima kasih! Ucapan Anda telah dikirim.");
+                        } catch (error) {
+                            console.error("Error mengirim pesan: ", error);
+                            showToast("Gagal mengirim ucapan. Periksa koneksi Anda.");
+                        } finally {
+                            submitBtn.innerText = originalText;
+                            submitBtn.disabled = false;
+                        }
+                    });
+                }
+
+            } catch (err) {
+                console.error("Firebase error", err);
+                setupOfflineMode();
+            }
+        } else {
+            // Jika berjalan di GitHub Pages tanpa dihubungkan ke firebase config, aktifkan mode lokal
+            setupOfflineMode();
+        }
+
+        function setupOfflineMode() {
+            console.log("Menjalankan Mode Offline (Local Storage)");
+            const savedData = localStorage.getItem('guestbook_local_' + appId);
+            if (savedData) {
+                localGuestbook = JSON.parse(savedData);
+            }
+            renderLocalGuestbook();
+
+            if (rsvpForm) {
+                rsvpForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const name = document.getElementById('rsvp-name').value;
+                    const status = document.getElementById('rsvp-status').value;
+                    const message = document.getElementById('rsvp-message').value;
+
+                    const newComment = {
+                        name: name,
+                        status: status,
+                        message: message,
+                        timestamp: Date.now()
+                    };
+
+                    localGuestbook.push(newComment);
+                    localStorage.setItem('guestbook_local_' + appId, JSON.stringify(localGuestbook));
+                    renderLocalGuestbook();
+                    rsvpForm.reset();
+                    showToast("Terima kasih! Ucapan Anda disimpan secara lokal.");
+                });
+            }
         }
     </script>
 </body>
