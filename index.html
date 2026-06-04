@@ -422,20 +422,29 @@
             flex-direction: column;
             gap: 3rem;
             margin-top: 2rem;
+            align-items: center; /* Pastikan semua item berada di tengah */
+            width: 100%;
         }
 
         .couple-card {
             text-align: center;
+            width: 100%;
+            max-width: 280px; /* Batasi lebar kartu mempelai */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .couple-img {
             width: 180px;
+            max-width: 90%; /* Mengunci lebar responsif gambar agar tidak meluap */
             height: 220px;
             object-fit: cover;
             border-radius: 100px 100px 15px 15px; /* Arch Shape */
             border: 5px solid var(--white);
             box-shadow: var(--box-shadow);
             margin-bottom: 1.5rem;
+            display: block;
         }
 
         .couple-name {
@@ -515,24 +524,23 @@
         /* ============================ GALLERY ============================ */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            /* SOLUSI: Menggunakan minmax(0, 1fr) memaksa kolom untuk tidak melar melampaui lebar layar HP */
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
             gap: 12px;
             margin-top: 1.5rem;
+            width: 100%;
         }
 
         .gallery-item {
             width: 100%;
+            max-width: 100%; /* Kunci lebar agar gambar tidak meluap keluar grid */
             height: 160px;
             object-fit: cover;
             border-radius: 10px;
             box-shadow: var(--box-shadow);
+            display: block; /* Menghilangkan spasi kosong ekstra di bawah gambar */
         }
-
-        .gallery-item:first-child {
-            grid-column: span 2;
-            height: 250px;
-        }
-
+        
         /* ============================ WEDDING GIFT (AMPLOP DIGITAL) ============================ */
         #gift {
             background-color: var(--primary-color);
