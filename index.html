@@ -983,6 +983,35 @@
         </div> <!-- End Mobile Container -->
     </div> <!-- End Desktop Wrapper -->
 
+    <!-- ============================ CUSTOM MODAL FOR ADMIN LOGIN (NO ALERT) ============================ -->
+    <div id="admin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 20000; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: var(--bg-color); max-width: 320px; width: 100%; padding: 2rem; border-radius: var(--border-radius); text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+            <i class="fas fa-user-shield" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+            <h4 class="font-heading" style="font-size: 1.3rem; margin-bottom: 1rem;">Panel Keamanan Admin</h4>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1.5rem;">Masukkan PIN Keamanan untuk mengaktifkan fitur hapus pesan.</p>
+            <div class="form-group">
+                <input type="password" id="admin-pin" class="form-control" placeholder="PIN Keamanan" style="text-align: center; letter-spacing: 5px;" required>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                <button id="btn-admin-cancel" class="btn-primary btn-outline" style="flex: 1; padding: 10px 0;">Batal</button>
+                <button id="btn-admin-submit" class="btn-primary" style="flex: 1; padding: 10px 0;">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================ CUSTOM MODAL CONFIRM DELETE ============================ -->
+    <div id="confirm-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 20001; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: var(--white); max-width: 300px; width: 100%; padding: 1.5rem; border-radius: var(--border-radius); text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #ff6b6b; margin-bottom: 1rem;"></i>
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem; font-size: 1.1rem;">Hapus Ucapan?</h4>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 1.5rem;">Tindakan ini tidak dapat dibatalkan. Ucapan akan dihapus secara permanen.</p>
+            <div style="display: flex; gap: 10px;">
+                <button id="btn-confirm-cancel" class="btn-primary btn-outline" style="flex: 1; padding: 8px 0; font-size: 0.85rem;">Batal</button>
+                <button id="btn-confirm-delete" class="btn-primary" style="flex: 1; padding: 8px 0; font-size: 0.85rem; background-color: #ff6b6b;">Hapus</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ============================ TOAST NOTIFICATION (ALERT) ============================ -->
     <div id="toast">Nomor rekening berhasil disalin!</div>
 
@@ -1160,13 +1189,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'undangan-app';
         
         const rsvpForm = document.getElementById('rsvp-form');
         const guestbookList = document.getElementById('guestbook-list');
+
+        // State Admin Rahasia
+        let isAdmin = sessionStorage.getItem('isAdmin_state') === 'true';
+        const SECRET_PIN = "1234"; // Silakan ubah PIN admin rahasia Anda di sini!
+        let activeDeleteDocId = null;
 
         function showToast(message) {
             var toast = document.getElementById("toast");
@@ -1179,11 +1213,12 @@
 
         // Data Ucapan Bawaan (Default/Offline Demo)
         let localGuestbook = [
-            { name: "Keluarga Bpk. Haryo", status: "hadir", message: "Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.", timestamp: Date.now() - 30000 },
-            { name: "Siska (Sahabat Kampus)", status: "hadir", message: "Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.", timestamp: Date.now() - 20000 },
-            { name: "Rizal (Rekan Kantor)", status: "tidak", message: "Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!", timestamp: Date.now() - 10000 }
+            { id: "local-1", name: "Keluarga Bpk. Haryo", status: "hadir", message: "Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.", timestamp: Date.now() - 30000 },
+            { id: "local-2", name: "Siska (Sahabat Kampus)", status: "hadir", message: "Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.", timestamp: Date.now() - 20000 },
+            { id: "local-3", name: "Rizal (Rekan Kantor)", status: "tidak", message: "Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!", timestamp: Date.now() - 10000 }
         ];
 
+        /* */
         function renderLocalGuestbook() {
             if (!guestbookList) return;
             guestbookList.innerHTML = ''; 
@@ -1193,15 +1228,23 @@
                 let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
                 let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
 
+                // Tampilkan tombol hapus jika status adalah Admin
+                const deleteButtonHtml = isAdmin ? 
+                    `<button class="delete-msg-btn" data-id="${msg.id}" style="background: none; border: none; color: #ff6b6b; cursor: pointer; padding: 5px; font-size: 0.95rem; transition: transform 0.2s;"><i class="fas fa-trash-alt"></i></button>` : '';
+
                 commentDiv.innerHTML = `
-                    <div class="gc-name">
-                        ${window.escapeHTML(msg.name)} 
-                        <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                    <div class="gc-name" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span>
+                            ${window.escapeHTML(msg.name)} 
+                            <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                        </span>
+                        ${deleteButtonHtml}
                     </div>
-                    <div class="gc-text">${window.escapeHTML(msg.message)}</div>
+                    <div class="gc-text" style="margin-top: 8px;">${window.escapeHTML(msg.message)}</div>
                 `;
                 guestbookList.appendChild(commentDiv);
             });
+            attachDeleteListeners();
         }
 
         // Jalankan Firebase jika konfigurasi tersedia
@@ -1251,15 +1294,23 @@
                                     let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
                                     let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
 
+                                    // Tampilkan tombol hapus jika status adalah Admin
+                                    const deleteButtonHtml = isAdmin ? 
+                                        `<button class="delete-msg-btn" data-id="${msg.id}" style="background: none; border: none; color: #ff6b6b; cursor: pointer; padding: 5px; font-size: 0.95rem; transition: transform 0.2s;"><i class="fas fa-trash-alt"></i></button>` : '';
+
                                     commentDiv.innerHTML = `
-                                        <div class="gc-name">
-                                            ${window.escapeHTML(msg.name)} 
-                                            <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                                        <div class="gc-name" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                            <span>
+                                                ${window.escapeHTML(msg.name)} 
+                                                <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                                            </span>
+                                            ${deleteButtonHtml}
                                         </div>
-                                        <div class="gc-text">${window.escapeHTML(msg.message)}</div>
+                                        <div class="gc-text" style="margin-top: 8px;">${window.escapeHTML(msg.message)}</div>
                                     `;
                                     guestbookList.appendChild(commentDiv);
                                 });
+                                attachDeleteListeners();
                             }
                         }, (error) => {
                             console.error("Gagal sinkronisasi data Firebase, beralih ke local:", error);
@@ -1306,6 +1357,18 @@
                     });
                 }
 
+                // Handler Penghapusan Pesan Firebase Firestore
+                window.deleteMessageAction = async function(docId) {
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guestbook', docId);
+                        await deleteDoc(docRef);
+                        showToast("Ucapan berhasil dihapus dari sistem!");
+                    } catch (error) {
+                        console.error("Gagal menghapus dokumen Firebase:", error);
+                        showToast("Gagal menghapus ucapan.");
+                    }
+                };
+
             } catch (err) {
                 console.error("Firebase error", err);
                 setupOfflineMode();
@@ -1315,6 +1378,7 @@
             setupOfflineMode();
         }
 
+        /* */
         function setupOfflineMode() {
             console.log("Menjalankan Mode Offline (Local Storage)");
             const savedData = localStorage.getItem('guestbook_local_' + appId);
@@ -1331,6 +1395,7 @@
                     const message = document.getElementById('rsvp-message').value;
 
                     const newComment = {
+                        id: "local-" + Date.now(),
                         name: name,
                         status: status,
                         message: message,
@@ -1344,6 +1409,116 @@
                     showToast("Terima kasih! Ucapan Anda disimpan secara lokal.");
                 });
             }
+
+            // Handler Penghapusan Pesan Offline Local Storage
+            window.deleteMessageAction = function(docId) {
+                localGuestbook = localGuestbook.filter(msg => msg.id !== docId);
+                localStorage.setItem('guestbook_local_' + appId, JSON.stringify(localGuestbook));
+                renderLocalGuestbook();
+                showToast("Ucapan berhasil dihapus!");
+            };
+        }
+
+        // ============================ KONTROL MODAL & LOGIN ADMIN RAHASIA ============================
+        const footerTitle = document.querySelector('footer h2');
+        const adminModal = document.getElementById('admin-modal');
+        const adminPinInput = document.getElementById('admin-pin');
+        const btnAdminCancel = document.getElementById('btn-admin-cancel');
+        const btnAdminSubmit = document.getElementById('btn-admin-submit');
+
+        const confirmModal = document.getElementById('confirm-modal');
+        const btnConfirmCancel = document.getElementById('btn-confirm-cancel');
+        const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+
+        // Buka Panel Admin dengan ketukan ganda (Double Click) di Judul Footer
+        if (footerTitle) {
+            footerTitle.addEventListener('dblclick', () => {
+                if (isAdmin) {
+                    // Jika sudah admin, dblclick akan menonaktifkan status admin
+                    isAdmin = false;
+                    sessionStorage.removeItem('isAdmin_state');
+                    showToast("Status Admin dinonaktifkan.");
+                    // Muat ulang daftar komentar untuk menyembunyikan ikon sampah
+                    if (firebaseConfig && firebaseConfig.apiKey) {
+                        // OnSnapshot otomatis memicu render ulang
+                    } else {
+                        renderLocalGuestbook();
+                    }
+                } else {
+                    adminModal.style.display = 'flex';
+                    adminPinInput.focus();
+                }
+            });
+        }
+
+        // Batal login admin
+        if (btnAdminCancel) {
+            btnAdminCancel.addEventListener('click', () => {
+                adminModal.style.display = 'none';
+                adminPinInput.value = '';
+            });
+        }
+
+        // Submit login admin
+        if (btnAdminSubmit) {
+            btnAdminSubmit.addEventListener('click', performAdminLogin);
+        }
+        if (adminPinInput) {
+            adminPinInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performAdminLogin();
+            });
+        }
+
+        function performAdminLogin() {
+            if (adminPinInput.value === SECRET_PIN) {
+                isAdmin = true;
+                sessionStorage.setItem('isAdmin_state', 'true');
+                adminModal.style.display = 'none';
+                adminPinInput.value = '';
+                showToast("Berhasil masuk sebagai Admin! Tombol hapus aktif.");
+                
+                // Memicu render ulang komentar agar memunculkan tombol hapus
+                if (firebaseConfig && firebaseConfig.apiKey) {
+                    // Firebase onSnapshot otomatis mendeteksi perubahan state jika dipicu render manual
+                    window.location.reload(); // Memuat ulang halaman untuk penyegaran render state paling stabil
+                } else {
+                    renderLocalGuestbook();
+                }
+            } else {
+                showToast("PIN yang Anda masukkan salah!");
+                adminPinInput.value = '';
+                adminPinInput.focus();
+            }
+        }
+
+        // Memasang Listener pada setiap tombol sampah setelah dirender
+        function attachDeleteListeners() {
+            const deleteButtons = document.querySelectorAll('.delete-msg-btn');
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    activeDeleteDocId = btn.getAttribute('data-id');
+                    confirmModal.style.display = 'flex';
+                });
+            });
+        }
+
+        // Batal hapus ucapan
+        if (btnConfirmCancel) {
+            btnConfirmCancel.addEventListener('click', () => {
+                confirmModal.style.display = 'none';
+                activeDeleteDocId = null;
+            });
+        }
+
+        // Setuju hapus ucapan
+        if (btnConfirmDelete) {
+            btnConfirmDelete.addEventListener('click', () => {
+                if (activeDeleteDocId) {
+                    window.deleteMessageAction(activeDeleteDocId);
+                    confirmModal.style.display = 'none';
+                    activeDeleteDocId = null;
+                }
+            });
         }
     </script>
 </body>
