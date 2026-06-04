@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Font Heading: Playfair Display | Font Body: Poppins -->
-    <link href="https://fonts.googleapis.com/css2 family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- ============================ FONT AWESOME ============================ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1002,6 +1002,23 @@
 
     <!-- ============================ JAVASCRIPT UTAMA (UI & INTERAKSI) ============================ -->
     <script>
+        /* ============================ 00. ANTI-STUCK SYSTEM (FORCE RESET ON RELOAD) ============================ */
+        // 1. Perintahkan peramban (browser) untuk TIDAK mengingat posisi scroll terakhir (Scroll Restoration)
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        // 2. Paksa layar untuk selalu kembali ke posisi teratas (Sampul Undangan) secara instan saat reload
+        window.scrollTo(0, 0);
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+        });
+
+        // 3. Bersihkan tanda pagar (#) pada URL (seperti #hero, #couple) untuk mencegah browser melompat otomatis ke section tersebut
+        if (window.location.hash) {
+            history.replaceState("", document.title, window.location.pathname + window.location.search);
+        }
+
         /* ============================ 0. GENERATE NAMA TAMU DARI URL ============================ */
         const urlParams = new URLSearchParams(window.location.search);
         const guestName = urlParams.get('to');
@@ -1199,7 +1216,6 @@
         // PERBAIKAN: Mengosongkan data ucapan bawaan (Default/Offline Demo)
         let localGuestbook = [];
 
-        /* */
         function renderLocalGuestbook() {
             if (!guestbookList) return;
             guestbookList.innerHTML = ''; 
@@ -1366,7 +1382,6 @@
             setupOfflineMode();
         }
 
-        /* */
         function setupOfflineMode() {
             console.log("Menjalankan Mode Offline (Local Storage)");
             const savedData = localStorage.getItem('guestbook_local_' + appId);
