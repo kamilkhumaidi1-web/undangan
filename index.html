@@ -730,11 +730,9 @@
     <div class="desktop-wrapper">
         
         <!-- ============================ DESKTOP LEFT PANEL ============================ -->
-        <!-- Bagian ini khusus muncul jika dibuka melalui PC/Laptop -->
         <div class="desktop-left">
             <p class="dl-subtitle">Our Wedding Invitation</p>
             
-            <!-- Struktur Baru dengan Watermark -->
             <div class="dl-title-wrapper">
                 <span class="dl-watermark">&</span>
                 <h1 class="dl-title">Riris &<br>Aris</h1>
@@ -744,11 +742,9 @@
         </div>
 
         <!-- ============================ MOBILE CONTAINER ============================ -->
-        <!-- Area undangan utama yang menyerupai tampilan layar Handphone -->
         <div class="mobile-container">
 
             <!-- ============================ AUDIO ELEMENT ============================ -->
-            <!-- Ganti src dengan link file audio .mp3 milik klien -->
             <audio id="bg-music" loop>
                 <source src="https://cdn.jsdelivr.net/gh/kamilkhumaidi1-web/undangan/Muhammad_al_Muqit_-_Wedding_(mp3.pm).mp3" type="audio/mpeg">
             </audio>
@@ -786,13 +782,11 @@
                 <p class="hero-top-text reveal">THE WEDDING OF</p>
                 
                 <div class="hero-arch-wrapper reveal">
-                    <!-- Ganti gambar cover Arch di bawah ini -->
                     <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=80" alt="Couple Cover" class="hero-img">
                 </div>
 
                 <h1 class="hero-names reveal">Riris & Aris</h1>
                 
-                <!-- Countdown Inline Style -->
                 <div class="hero-countdown-inline reveal">
                     <div class="hc-item"><span id="hari-hero">00</span><small>Days</small></div>
                     <div class="hc-item"><span id="jam-hero">00</span><small>Hours</small></div>
@@ -800,7 +794,7 @@
                     <div class="hc-item"><span id="detik-hero">00</span><small>Seconds</small></div>
                 </div>
 
-                <p class="hero-date reveal">MINGGU, 07 DESEMBER 2025</p>
+                <p class="hero-date reveal">MINGGU, 07 DESEMBER 2026</p>
             </section>
 
             <!-- ============================ QUOTE SECTION ============================ -->
@@ -845,14 +839,14 @@
                     <i class="fas fa-ring event-icon"></i>
                     <h3 class="event-title">AKAD NIKAH</h3>
                     <div class="event-time">
-                        <p><strong>Minggu, 07 Desember 2025</strong></p>
+                        <p><strong>Minggu, 07 Desember 2026</strong></p>
                         <p>Pukul 08.00 WIB - Selesai</p>
                     </div>
                     <div class="event-location">
                         <p><strong>Masjid Agung Kota Raya</strong></p>
                         <p>Jl. Pahlawan No. 123, Jakarta Selatan</p>
                     </div>
-                    <a href="https://share.google/zLkgG4WV5cTayMxIG"_blank" class="btn-primary btn-outline">
+                    <a href="https://share.google/zLkgG4WV5cTayMxIG" target="_blank" class="btn-primary btn-outline">
                         <i class="fas fa-map-marker-alt"></i> Lihat Lokasi
                     </a>
                 </div>
@@ -862,7 +856,7 @@
                     <i class="fas fa-glass-cheers event-icon"></i>
                     <h3 class="event-title">RESEPSI</h3>
                     <div class="event-time">
-                        <p><strong>Minggu, 07 Desember 2025</strong></p>
+                        <p><strong>Minggu, 07 Desember 2026</strong></p>
                         <p>Pukul 11.00 - 14.00 WIB</p>
                     </div>
                     <div class="event-location">
@@ -941,22 +935,7 @@
 
                 <!-- Guestbook (Tempat Pesan Dinamis Akan Ditampilkan) -->
                 <div class="guestbook-box reveal" id="guestbook-list">
-                    <div class="guest-comment">
-                        <div class="gc-name">Keluarga Bpk. Haryo <span class="gc-badge">Hadir</span></div>
-                        <div class="gc-text">Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.</div>
-                    </div>
-                    <div class="guest-comment">
-                        <div class="gc-name">Siska (Sahabat Kampus) <span class="gc-badge">Hadir</span></div>
-                        <div class="gc-text">Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.</div>
-                    </div>
-                    <div class="guest-comment">
-                        <div class="gc-name">Rizal (Rekan Kantor) <span class="gc-badge" style="background:#eee; color: #666;">Tidak Hadir</span></div>
-                        <div class="gc-text">Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!</div>
-                    </div>
-                    <div class="guest-comment">
-                        <div class="gc-name">Tante Dina <span class="gc-badge">Hadir</span></div>
-                        <div class="gc-text">Alhamdulillah, selamat ya nak. Semoga kelak diberikan keturunan yang sholeh dan sholehah.</div>
-                    </div>
+                    <div style="text-align: center; color: #999; padding: 20px;">Memuat ucapan...</div>
                 </div>
             </section>
 
@@ -993,16 +972,39 @@
     <div id="toast">Nomor rekening berhasil disalin!</div>
 
     <!-- ============================ JAVASCRIPT ============================ -->
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Cloud Database (Firebase)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'undangan-app';
+        
+        let currentUser = null;
+
+        // Login anonim otomatis untuk keamanan akses database
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Gagal autentikasi", err);
+            }
+        };
+        initAuth();
+
         /* ============================ 0. GENERATE NAMA TAMU DARI URL ============================ */
-        // Mengambil nama tamu dari URL (contoh: domain.com/?to=Budi+Santoso)
         const urlParams = new URLSearchParams(window.location.search);
         const guestName = urlParams.get('to');
-        
-        // Mencari elemen HTML tempat nama tamu akan ditampilkan
         const guestNameElement = document.querySelector('.guest-name');
         
-        // Jika ada parameter ?to= di URL, tampilkan namanya. Jika tidak, tampilkan "Tamu Undangan"
         if (guestName) {
             guestNameElement.innerHTML = guestName;
         } else {
@@ -1017,22 +1019,14 @@
         let isPlaying = false;
 
         btnOpen.addEventListener('click', () => {
-            // Animasi Cover slide ke atas
             coverPage.classList.add('slide-up');
-            
-            // Buka kunci scroll halaman
             document.body.classList.add('opened');
-            
-            // Tampilkan tombol musik
             musicControl.style.display = 'flex';
             
-            // Putar audio otomatis
             bgMusic.play();
             isPlaying = true;
             musicControl.classList.add('playing');
 
-            // PERBAIKAN: Sembunyikan cover secara permanen setelah animasi selesai (1 detik) 
-            // agar tidak memblokir tombol klik di bawahnya.
             setTimeout(() => {
                 coverPage.style.display = 'none';
             }, 1000);
@@ -1053,7 +1047,7 @@
         });
 
         /* ============================ 3. COUNTDOWN TIMER ============================ */
-        // Silakan edit tanggal acara di sini (Format: Bulan Tanggal, Tahun Jam:Menit:Detik)
+        // Tanggal acara disesuaikan ke tahun 2026 agar hitung mundur dapat berjalan
         const weddingDate = new Date("Dec 07, 2026 08:00:00").getTime();
 
         const x = setInterval(function() {
@@ -1065,13 +1059,11 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Tampilkan ke elemen HTML di bagian Hero
             document.getElementById("hari-hero").innerHTML = days < 10 ? "0" + days : days;
             document.getElementById("jam-hero").innerHTML = hours < 10 ? "0" + hours : hours;
             document.getElementById("menit-hero").innerHTML = minutes < 10 ? "0" + minutes : minutes;
             document.getElementById("detik-hero").innerHTML = seconds < 10 ? "0" + seconds : seconds;
 
-            // Jika hitung mundur selesai
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("hari-hero").innerHTML = "00";
@@ -1087,7 +1079,7 @@
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100; // Toleransi jarak px sebelum animasi dimulai
+                var elementVisible = 100;
 
                 if (elementTop < windowHeight - elementVisible) {
                     reveals[i].classList.add("active");
@@ -1095,24 +1087,23 @@
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal(); // Panggil fungsi saat web pertama kali dimuat
+        reveal();
 
         /* ============================ 5. SALIN TEKS (COPY TO CLIPBOARD) ============================ */
-        function copyText(elementId) {
-            // Mengambil teks dari elemen berdasarkan ID
+        window.copyText = function(elementId) {
             var textToCopy = document.getElementById(elementId).innerText;
             
-            // API Clipboard modern
             navigator.clipboard.writeText(textToCopy).then(() => {
-                // Tampilkan pesan Notifikasi (Toast Alert)
                 var toast = document.getElementById("toast");
                 toast.innerText = "Nomor rekening berhasil disalin!";
                 toast.className = "show";
-                
-                // Hilangkan alert setelah 3 detik
                 setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
             }).catch(err => {
-                alert("Gagal menyalin. Silakan copy manual.");
+                document.execCommand('copy');
+                var toast = document.getElementById("toast");
+                toast.innerText = "Nomor berhasil disalin!";
+                toast.className = "show";
+                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
             });
         }
 
@@ -1122,67 +1113,115 @@
 
         window.addEventListener("scroll", () => {
             let current = "";
+            const scrollPosition = window.scrollY || window.pageYOffset;
+
             sections.forEach((section) => {
                 const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                // Deteksi section mana yang sedang dilihat
-                if (pageYOffset >= sectionTop - 150) {
+                if (scrollPosition >= sectionTop - 150) {
                     current = section.getAttribute("id");
                 }
             });
 
-            // Ganti warna ikon navigasi di bawah
             navItems.forEach((li) => {
                 li.classList.remove("active");
-                if (li.getAttribute("href").includes(current)) {
+                if (current && li.getAttribute("href").includes(current)) {
                     li.classList.add("active");
                 }
             });
         });
 
-        /* ============================ 7. DINAMIS GUESTBOOK (RSVP) ============================ */
+        /* ============================ 7. DINAMIS GUESTBOOK (RSVP) DENGAN DATABASE ============================ */
         const rsvpForm = document.getElementById('rsvp-form');
         const guestbookList = document.getElementById('guestbook-list');
 
-        rsvpForm.addEventListener('submit', function(e) {
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // Listener untuk memuat data secara realtime
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
+                
+                onSnapshot(messagesRef, (snapshot) => {
+                    const messages = [];
+                    snapshot.forEach((doc) => {
+                        messages.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Urutkan ucapan dari yang terbaru di memori
+                    messages.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                    
+                    guestbookList.innerHTML = ''; 
+                    
+                    if (messages.length === 0) {
+                        guestbookList.innerHTML = '<div style="text-align: center; color: #999; padding:20px;">Belum ada ucapan. Jadilah yang pertama!</div>';
+                        return;
+                    }
+
+                    messages.forEach(msg => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.className = 'guest-comment';
+
+                        let badgeText = msg.status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
+                        let badgeStyle = msg.status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
+
+                        commentDiv.innerHTML = `
+                            <div class="gc-name">
+                                ${escapeHTML(msg.name)} 
+                                <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
+                            </div>
+                            <div class="gc-text">${escapeHTML(msg.message)}</div>
+                        `;
+                        guestbookList.appendChild(commentDiv);
+                    });
+                }, (error) => {
+                    console.error("Gagal memuat pesan:", error);
+                });
+            }
+        });
+
+        rsvpForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Ambil data input
+            if (!currentUser) {
+                showToast("Sistem belum siap. Mohon tunggu sebentar.");
+                return;
+            }
+
             const name = document.getElementById('rsvp-name').value;
             const status = document.getElementById('rsvp-status').value;
             const message = document.getElementById('rsvp-message').value;
+            const submitBtn = rsvpForm.querySelector('button[type="submit"]');
 
-            // Buat element komentar baru
-            const commentDiv = document.createElement('div');
-            commentDiv.className = 'guest-comment';
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "Mengirim...";
+            submitBtn.disabled = true;
 
-            // Logika badge warna kehadiran sesuai gambar referensi Anda
-            let badgeText = status === 'hadir' ? 'Hadir' : 'Tidak Hadir';
-            let badgeStyle = status === 'hadir' ? '' : 'style="background:#eee; color:#666;"';
+            try {
+                const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'guestbook');
+                await addDoc(messagesRef, {
+                    name: name,
+                    status: status,
+                    message: message,
+                    timestamp: Date.now()
+                });
 
-            // Masukkan data ke element komentar baru dengan aman (Anti-XSS)
-            commentDiv.innerHTML = `
-                <div class="gc-name">
-                    ${escapeHTML(name)} 
-                    <span class="gc-badge" ${badgeStyle}>${badgeText}</span>
-                </div>
-                <div class="gc-text">${escapeHTML(message)}</div>
-            `;
-
-            // Masukkan komentar baru di baris PALING ATAS kotak ucapan
-            guestbookList.insertBefore(commentDiv, guestbookList.firstChild);
-
-            // Reset form input setelah dikirim
-            rsvpForm.reset();
-
-            // Berikan notifikasi toast sukses kirim ucapan
-            var toast = document.getElementById("toast");
-            toast.innerText = "Terima kasih! Ucapan Anda telah dikirim.";
-            toast.className = "show";
-            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+                rsvpForm.reset();
+                showToast("Terima kasih! Ucapan Anda telah dikirim.");
+            } catch (error) {
+                console.error("Error mengirim pesan: ", error);
+                showToast("Gagal mengirim ucapan. Periksa koneksi Anda.");
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
-        // Fungsi pembantu untuk mencegah celah keamanan XSS (Cross-Site Scripting)
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({
@@ -1194,7 +1233,6 @@
                 }[tag] || tag)
             );
         }
-
     </script>
 </body>
 </html>
