@@ -935,10 +935,7 @@
 
                 <!-- Guestbook (Tempat Pesan Dinamis Akan Ditampilkan) -->
                 <div class="guestbook-box reveal" id="guestbook-list">
-                    <div class="guest-comment">
-                        <div class="gc-name">Azfar Arfakhsyad <span class="gc-badge">Hadir</span></div>
-                        <div class="gc-text">Alhamdulillah, selamat ya nak. Semoga kelak diberikan keturunan yang sholeh dan sholehah.</div>
-                    </div>
+                    <div style="text-align: center; color: #999; padding:20px;">Belum ada ucapan. Jadilah yang pertama!</div>
                 </div>
             </section>
 
@@ -1199,17 +1196,20 @@
             }
         }
 
-        // Data Ucapan Bawaan (Default/Offline Demo)
-        let localGuestbook = [
-            { id: "local-1", name: "Keluarga Bpk. Haryo", status: "hadir", message: "Selamat menempuh hidup baru Riris & Aris! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah.", timestamp: Date.now() - 30000 },
-            { id: "local-2", name: "Siska (Sahabat Kampus)", status: "hadir", message: "Happy wedding bestie!! Lancar sampai hari H yaa, doa terbaik buat kalian berdua.", timestamp: Date.now() - 20000 },
-            { id: "local-3", name: "Rizal (Rekan Kantor)", status: "tidak", message: "Selamat bro! Maaf banget gue lagi dinas luar kota jadi gak bisa mampir. Langgeng terus ya!", timestamp: Date.now() - 10000 }
-        ];
+        // PERBAIKAN: Mengosongkan data ucapan bawaan (Default/Offline Demo)
+        let localGuestbook = [];
 
         /* */
         function renderLocalGuestbook() {
             if (!guestbookList) return;
             guestbookList.innerHTML = ''; 
+            
+            // Tampilkan penampung jika tidak ada data sama sekali
+            if (localGuestbook.length === 0) {
+                guestbookList.innerHTML = '<div style="text-align: center; color: #999; padding:20px;">Belum ada ucapan. Jadilah yang pertama!</div>';
+                return;
+            }
+
             localGuestbook.sort((a, b) => b.timestamp - a.timestamp).forEach(msg => {
                 const commentDiv = document.createElement('div');
                 commentDiv.className = 'guest-comment';
