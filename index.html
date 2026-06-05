@@ -1201,7 +1201,16 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        // GANTI DI SINI: Memasang konfigurasi database cloud asli Anda dari faktakarta
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwvnZtF7pcqsknD-pdz53n3m-BsPYX-1w",
+            authDomain: "faktakarta-a71e0.firebaseapp.com",
+            projectId: "faktakarta-a71e0",
+            storageBucket: "faktakarta-a71e0.firebasestorage.app",
+            messagingSenderId: "295410199531",
+            appId: "1:295410199531:web:b8ba4bcaf8225fb7a187ae",
+            measurementId: "G-Q6K44R835V"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'undangan-app';
         
         const rsvpForm = document.getElementById('rsvp-form');
